@@ -1,57 +1,4 @@
 import streamlit as st
-
-#(BLACK & ORANGE)
-st.markdown("""
-<style>
-
-.stApp {
-    background-color: #0e1117;
-    color: white;
-}
-
-/* Sidebar */
-section[data-testid="stSidebar"] {
-    background-color: #111111;
-}
-
-/* Buttons */
-.stButton>button {
-    background-color: #ff7a00;
-    color: white;
-    border-radius: 10px;
-    border: none;
-    font-weight: bold;
-}
-.stButton>button:hover {
-    background-color: #ff9500;
-}
-
-/* Input boxes */
-.stTextInput>div>div>input,
-.stNumberInput input,
-.stDateInput input {
-    background-color: #1c1c1c;
-    color: white;
-}
-
-/* Selectbox */
-.stSelectbox div[data-baseweb="select"] {
-    background-color: #1c1c1c;
-}
-
-/* Metric cards */
-[data-testid="stMetricValue"] {
-    color: #ff7a00;
-}
-
-/* Titles */
-h1, h2, h3 {
-    color: #ff7a00;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
 from database import *
 from analytics import *
 
@@ -60,17 +7,17 @@ st.set_page_config(page_title="Expense Tracker Ano Tara", page_icon="💰", layo
 
 create_table()
 
-# Sidebar
+# Side bar to sya dito
 st.sidebar.title("💰 Expense Tracker")
 st.sidebar.write("A Smart Student Finance App")
 menu = ["➕ Add Expense","📄 View Expenses","📊 Dashboard"]
 choice = st.sidebar.radio("Navigate", menu)
 
-# Title
+# Dito yung sa title
 st.title("💰 iSmart Expense Tracker Ano Tara?")
 st.write("Track your daily spending and understand your money better! at wag maging gastador")
 
-# ---------------- ADD EXPENSE ----------------
+#ADD EXPENSE
 if choice == "➕ Add Expense":
     st.subheader("Add New Expense")
 
@@ -88,16 +35,22 @@ if choice == "➕ Add Expense":
         add_expense(str(date), amount, category, desc)
         st.success("✅ Expense Added Successfully!")
 
-# ---------------- VIEW EXPENSES ----------------
+#VIEW EXPENSES
 elif choice == "📄 View Expenses":
     st.subheader("All Expenses")
 
-    if len(st.session_state.expenses) == 0:
-        st.info("No expenses yet")
+    data = view_expenses()
+
+    if data:
+        df = load_data(data)
+        st.dataframe(df, use_container_width=True)
+
+        total = df["Amount"].sum()
+        st.metric("💸 Total Spending", f"₱ {total:.2f}")
     else:
         st.info("No expenses yet.")
 
-# ---------------- DASHBOARD ----------------
+#DASHBOARD
 elif choice == "📊 Dashboard":
     st.subheader("Spending Dashboard")
 
